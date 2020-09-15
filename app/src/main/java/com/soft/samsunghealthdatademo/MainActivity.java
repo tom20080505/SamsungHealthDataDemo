@@ -11,9 +11,18 @@ import com.samsung.android.sdk.healthdata.HealthConnectionErrorResult;
 import com.samsung.android.sdk.healthdata.HealthConstants;
 import com.samsung.android.sdk.healthdata.HealthDataStore;
 import com.samsung.android.sdk.healthdata.HealthPermissionManager;
+import com.samsung.android.sdk.healthdata.HealthPermissionManager.PermissionKey;
+import com.samsung.android.sdk.healthdata.HealthResultHolder;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static com.samsung.android.sdk.healthdata.HealthPermissionManager.*;
+
+
+// https://developer.samsung.com/health/android/data/guide/hello-health-data.html
+
 
 public class MainActivity extends AppCompatActivity {
 public static final String APP_TAG = "SimpleHealth";
@@ -21,7 +30,7 @@ private static  MainActivity mInstance = null;
 
 private HealthDataStore mStore;
 private HealthConnectionErrorResult mConnError;
-private Set<HealthPermissionManager.PermissionKey> mKeySet;
+private Set<PermissionKey> mKeySet;
 
 
     @Override
@@ -48,10 +57,10 @@ private Set<HealthPermissionManager.PermissionKey> mKeySet;
     void samsungHealthInit()
     {
         mInstance = this;
-        mKeySet = new HashSet<HealthPermissionManager.PermissionKey>();
-        mKeySet.add(new HealthPermissionManager.PermissionKey(
+        mKeySet = new HashSet<PermissionKey>();
+        mKeySet.add(new PermissionKey(
                             HealthConstants.StepCount.HEALTH_DATA_TYPE,
-                            HealthPermissionManager.PermissionType.READ));
+                            PermissionType.READ));
         mStore = new HealthDataStore(this, mConnectionListener);
         mStore.connectService();
     }
@@ -112,8 +121,22 @@ private Set<HealthPermissionManager.PermissionKey> mKeySet;
                 public void onConnected() {
                     Log.w(APP_TAG, "Health data service is connected.");
                     HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
+                    mKeySet.add(new PermissionKey(HealthConstants.Exercise.HEALTH_DATA_TYPE, PermissionType.READ));
+                    mKeySet.add(new PermissionKey(HealthConstants.Exercise.HEALTH_DATA_TYPE, PermissionType.WRITE));
+                    mKeySet.add(new PermissionKey("com.samsung.shealth.step_daily_trend", PermissionType.READ));
+
 
                     try {
+                        Map<PermissionKey, Boolean> resultMap = pmsManager.isPermissionAcquired(mKeySet);
+                        if (resultMap.containsValue(Boolean.FALSE))
+                        {
+                            pmsManager.requestPermissions(mKeySet,
+                                    MainActivity.this).setResultListener(mPermissionListener);
+                        }
+                        else
+                        {
+                            Log.d(APP_TAG, "requestPermissions() fails");
+                        }
 
                     }
                     catch (Exception e)
@@ -137,4 +160,22 @@ private Set<HealthPermissionManager.PermissionKey> mKeySet;
                     Log.d(APP_TAG, "Health data service is disconnected.");
                 }
             };
+
+    private final HealthResultHolder.ResultListener<PermissionResult>
+            mPermissionListener = new HealthResultHolder.ResultListener<PermissionResult>() {
+        @Override
+        public void onResult(PermissionResult permissionResult) {
+            Log.d(APP_TAG, "Permission callback is received.");
+            Map<PermissionKey, Boolean> resultMap = permissionResult.getResultMap();
+
+            if (resultMap.containsValue(Boolean.FALSE))
+            {
+                
+            }
+            else
+            {
+
+            }
+        }
+    };
 }

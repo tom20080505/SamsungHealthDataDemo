@@ -17,6 +17,8 @@
         tools:ignore="AllowBackup" >
         <meta-data android:name="com.samsung.android.health.permission.read"
             android:value="com.samsung.health.step_count"/>
+        <meta-data android:name="com.samsung.android.health.permission.write"
+            android:value="com.samsung.health.exercise"/>
 
         <activity android:name=".MainActivity">
             <intent-filter>
