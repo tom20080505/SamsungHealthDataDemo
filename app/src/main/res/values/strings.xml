@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SamsungHealthDataDemo</string>
+    <string name="get">Get</string>
+    <string name="clean">Clean</string>
+</resources>
