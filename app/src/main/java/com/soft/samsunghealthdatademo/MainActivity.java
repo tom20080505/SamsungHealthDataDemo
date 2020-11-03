@@ -25,7 +25,7 @@ import static com.samsung.android.sdk.healthdata.HealthPermissionManager.*;
 
 
 public class MainActivity extends AppCompatActivity {
-public static final String APP_TAG = "SimpleHealth";
+public static final String APP_TAG = "MLC APP SimpleHealth";
 private static  MainActivity mInstance = null;
 
 private HealthDataStore mStore;
